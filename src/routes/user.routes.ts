@@ -10,5 +10,6 @@ routeAuth.post(
   validatorData(UserSchema),
   userController.createUser
 );
+routeAuth.get("/", userController.getUser);
 routeAuth.put("/:id", userController.updateUser);
 routeAuth.delete("/:id", userController.deleteUser);
