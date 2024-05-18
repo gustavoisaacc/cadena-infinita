@@ -8,8 +8,8 @@ export const verifyToken = (
   res: express.Response,
   next: express.NextFunction
 ) => {
-  const token = req.headers["authorization"];
-  console.log(token);
+  const token = req.cookies.accessToken;
+  console.log(req.cookies);
   if (!token) {
     return res.status(401).json({ message: "authorization denied" });
   }
@@ -17,16 +17,13 @@ export const verifyToken = (
 
   jwt.verify(token, JWT_SECRET, async (err: any, decoded: any) => {
     if (err) {
-      return res.status(401).json({ message: "Invalid token." });
+      return res.status(401).json({ message: "Invalid token" });
     }
-    const user = await User.findById(decoded.id);
+    const _id = JSON.parse(decoded.payload);
+    console.log(_id);
+    const user = await User.findById(_id);
     if (!user) return res.status(401).json({ message: "no user found" });
 
-    user?.role.map((role: any) => {
-      if (role.name === "admin") {
-        console.log("admin");
-      }
-    });
     next();
   });
 };

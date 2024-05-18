@@ -12,16 +12,15 @@ export const signin = async (req: Request, res: Response) => {
   const checkPass = await checkPassword(checkResult.password, password);
 
   if (!checkPass) return res.status(301).json({ message: "Invalid password" });
-
-  const token = createAccessToken(checkResult._id);
+  const id = JSON.stringify(checkResult._id);
+  const token = await createAccessToken(id);
 
   res.cookie("accessToken", token, {
     httpOnly: true,
     sameSite: "none",
     //secure: true,
     maxAge: 24 * 60 * 60 * 100, //1 day
-    //secure: process.env.NODE_ENV === "production",
   });
 
-  return res.status(200).json({ token });
+  res.json(checkResult);
 };

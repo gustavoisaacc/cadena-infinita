@@ -12,5 +12,5 @@ routrUser.post(
   userController.createUser
 );
 routrUser.get("/", verifyToken, userController.getUser);
-routrUser.put("/:id", userController.updateUser);
-routrUser.delete("/:id", userController.deleteUser);
+routrUser.put("/:id", verifyToken, userController.updateUser);
+routrUser.delete("/:id", verifyToken, userController.deleteUser);

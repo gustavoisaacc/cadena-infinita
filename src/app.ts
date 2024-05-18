@@ -1,5 +1,6 @@
 import express, { NextFunction, Request, Response } from "express";
 import morgan from "morgan";
+import cookies from "cookie-parser";
 
 import { connectDB } from "./configs/db";
 import { routeRole } from "./routes/roles.routes";
@@ -8,9 +9,11 @@ import { routrUser } from "./routes/user.routes";
 import { routerAuth } from "./routes/auth.routes";
 
 export const app = express();
+app.use(morgan("dev"));
+app.use(cookies());
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(morgan("dev"));
 
 //CONFIG
 connectDB();

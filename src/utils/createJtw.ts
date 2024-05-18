@@ -1,10 +1,10 @@
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../configs/config";
 
-export const createAccessToken = async (paylod: string[]) => {
+export const createAccessToken = async (payload: string) => {
   return new Promise((resolve, reject) => {
     jwt.sign(
-      paylod,
+      { payload: payload },
       JWT_SECRET,
       {
         expiresIn: "1d",
