@@ -3,8 +3,9 @@ import morgan from "morgan";
 
 import { connectDB } from "./configs/db";
 import { routeRole } from "./routes/roles.routes";
-import { routeAuth } from "./routes/user.routes";
 import { createRole } from "./utils/initialSetup";
+import { routrUser } from "./routes/user.routes";
+import { routerAuth } from "./routes/auth.routes";
 
 export const app = express();
 app.use(express.json());
@@ -14,9 +15,11 @@ app.use(morgan("dev"));
 //CONFIG
 connectDB();
 createRole();
+
 //routes
 app.use("/api/v1/role", routeRole);
-app.use("/api/v1/user", routeAuth);
+app.use("/api/v1/user", routrUser);
+app.use("/api/v1/auth", routerAuth);
 
 //errors
 app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
