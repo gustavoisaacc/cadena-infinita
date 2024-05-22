@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import User from "../models/user.model";
-import { UserSchemaType } from "../schemas/user.schema";
+import { UserSchemaType, validatePartialUser } from "../schemas/user.schema";
 import Role from "../models/roles.model";
 import { findOneUtil } from "../utils/fineOneUtil";
 import { hashPassword } from "../utils/validateHandle";
@@ -32,19 +32,15 @@ export const createUser = async (
 
 export const updateUser = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const data: UserSchemaType = req.body;
+  const data = validatePartialUser(req.body);
 
-  const userFound = await findOneUtil({ id });
-
-  userFound.name = data.name;
-  userFound.username = data.username;
-  userFound.name = data.name;
-  userFound.fullname = data.fullname;
-  userFound.email = data.email;
-  userFound.password = data.password;
-
+  if (data.error) {
+    return res.status(400).json({ error: JSON.parse(data.error.message) });
+  }
+  let userFound = await findOneUtil({ id });
+  await userFound.updateOne(data.data);
   await userFound.save();
-  res.status(200).json({ message: "user updated successfully " });
+  return res.json({ message: "user updated successfully" });
 };
 
 export const getUser = async (_req: Request, res: Response) => {
@@ -54,9 +50,8 @@ export const getUser = async (_req: Request, res: Response) => {
 
 export const deleteUser = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const data: UserSchemaType = req.body;
   const userFound = await findOneUtil({ id });
-  userFound.isActive = data.isActive;
 
+  await userFound.deleteOne();
   res.json({ message: "user successfully disabled" });
 };

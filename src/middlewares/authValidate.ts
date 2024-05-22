@@ -1,12 +1,15 @@
-import express from "express";
-import jwt from "jsonwebtoken";
+import { Response, NextFunction } from "express";
+import { CustomRequest } from "../typings /express";
 import { JWT_SECRET } from "../configs/config";
+
+import jwt from "jsonwebtoken";
+import Role from "../models/roles.model";
 import User from "../models/user.model";
 
 export const verifyToken = (
-  req: express.Request,
-  res: express.Response,
-  next: express.NextFunction
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
 ) => {
   const token = req.cookies.accessToken;
   console.log(req.cookies);
@@ -19,11 +22,48 @@ export const verifyToken = (
     if (err) {
       return res.status(401).json({ message: "Invalid token" });
     }
-    const _id = JSON.parse(decoded.payload);
-    console.log(_id);
-    const user = await User.findById(_id);
+    req.userId = JSON.parse(decoded.payload);
+
+    const user = await User.findById(req.userId);
+
     if (!user) return res.status(401).json({ message: "no user found" });
 
     next();
   });
+};
+
+export const isSuperAdmin = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  const user = await User.findById(req.userId);
+  const role = await Role.find({ _id: { $in: user?.role } });
+  if (role[0].name !== "superadmin")
+    return res.status(401).json({ message: "no authorization" });
+  next();
+};
+
+export const isCustomer = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  const user = await User.findById(req.userId);
+  const role = await Role.find({ _id: { $in: user?.role } });
+  if (role[0].name !== "superadmin")
+    return res.status(401).json({ message: "no authorization" });
+  next();
+};
+
+export const isAdmin = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  const user = await User.findById(req.userId);
+  const role = await Role.find({ _id: { $in: user?.role } });
+  if (role[0].name !== "superadmin")
+    return res.status(401).json({ message: "no authorization" });
+  next();
 };

@@ -1,16 +1,24 @@
 import Router from "express-promise-router";
 import * as userController from "../controllers/user.controller";
 import { UserSchema } from "../schemas/user.schema";
-import { validatorData } from "../middlewares/validatorData";
-import { verifyToken } from "../middlewares/authValidate";
+import { validate } from "../middlewares/";
+import { auth } from "../middlewares";
 
 export const routrUser = Router();
 
 routrUser.post(
   "/new-user",
-  [verifyToken, validatorData(UserSchema)],
+  [auth.verifyToken, validate.validatorData(UserSchema)],
   userController.createUser
 );
-routrUser.get("/", verifyToken, userController.getUser);
-routrUser.put("/:id", verifyToken, userController.updateUser);
-routrUser.delete("/:id", verifyToken, userController.deleteUser);
+routrUser.get(
+  "/",
+  [auth.verifyToken, auth.isSuperAdmin],
+  userController.getUser
+);
+routrUser.put(
+  "/:id",
+  [auth.verifyToken, auth.isSuperAdmin],
+  userController.updateUser
+);
+routrUser.delete("/:id", auth.verifyToken, userController.deleteUser);

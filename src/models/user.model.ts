@@ -1,4 +1,7 @@
 import mongoose, { Types, type Document, type Schema } from "mongoose";
+import { categories } from "../schemas/user.schema";
+
+export type Categories = (typeof categories)[keyof typeof categories];
 
 interface IUser extends Document {
   name: string;
@@ -8,6 +11,7 @@ interface IUser extends Document {
   password: string;
   role: Types.ObjectId[];
   isActive: boolean;
+  category: Categories;
 }
 
 const UserSchema: Schema = new mongoose.Schema(
@@ -47,6 +51,10 @@ const UserSchema: Schema = new mongoose.Schema(
     isActive: {
       type: Boolean,
       default: true,
+    },
+    category: {
+      type: String,
+      enum: Object.values(categories),
     },
   },
   {
